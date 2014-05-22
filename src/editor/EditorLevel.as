@@ -1,0 +1,131 @@
+package editor 
+{
+	import data.ILevel;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	import flash.utils.setTimeout;
+	import land.Game;
+	import math.shapes.Circle;
+	import math.shapes.Line;
+	import math.Vector2D;
+	/**
+	 * ...
+	 * @author Automatic
+	 */
+	public class EditorLevel implements ILevel
+	{
+		private var _data:Vector.<Point>;
+		private var _lines:Vector.<Line>;
+		
+		private var _gravity:Number = 0.0005;
+		private var _startRotation:Number = 90;
+		private var _startVelocity:Vector2D = new Vector2D(0.2, 0.1);
+		private var _startLocation:Point = new Point(110, 110);
+		private var _timeScore:Number = 1000;
+		private var _landScore:Number = 500;
+		
+		public function EditorLevel(points:Vector.<LinePoint>) 
+		{
+			_data = new Vector.<Point>();
+			_lines = new Vector.<Line>();
+			
+			var i:int = 0;
+			for (i = 0; i < points.length; i++)
+			{
+				_data.push(new Point(points[i].x-100, points[i].y));
+			}
+			
+			
+			var prependArray:Vector.<Point> = _data.slice(0, _data.length);
+				for (i = 0; i < prependArray.length; i++)
+				{
+					prependArray[i] = prependArray[i].clone();
+					prependArray[i].x = -prependArray[i].x
+				}
+				
+			var appendArray:Vector.<Point> = _data.slice(0, _data.length);
+				for (i = 0; i < appendArray.length; i++)
+				{
+					appendArray[i] = appendArray[i].clone();
+					appendArray[i].x = (605 - appendArray[i].x) + 605;
+				}
+				
+			_data.reverse();		
+			_data = _data.concat(prependArray);
+			_data.reverse();
+			
+			appendArray.reverse();
+			_data = _data.concat(appendArray);
+			
+			for (i = 0; i < _data.length -1; i += 1)
+			{
+				_lines.push(new Line(_data[i+1], _data[i]));
+			}
+		}
+		
+		public function getLinesIn(x:Number, y:Number, radius:Number):Vector.<Line>
+		{
+			var tempLines:Vector.<Line> = new Vector.<Line>();
+			
+			var circle:Circle = new Circle(radius, x, y);
+				
+			if (Config.DEBUG && Game.DEBUG)
+			{
+				circle.debug(Game.DEBUG);
+			}
+			
+			for (var i:int; i < _lines.length; i++)
+			{
+				if (circle.containsOrIntersectsLine(lines[i]) == true)
+				{
+					if (Config.DEBUG && Game.DEBUG)
+					{
+						_lines[i].debug(Game.DEBUG, new Point(0, -2));
+					}
+					
+					tempLines.push(_lines[i]);
+				}
+			}
+			return tempLines;
+		}
+		
+		public function get data():Vector.<Point>
+		{
+			return _data;
+		}
+		
+		public function get lines():Vector.<Line> 
+		{
+			return _lines;
+		}
+		
+		
+		public function get startLocation():Point
+		{
+			return _startLocation;
+		}
+		public function get startRotation():Number
+		{
+			return _startRotation
+		}
+		
+		public function get gravity():Number 
+		{
+			return _gravity;
+		}
+		
+		public function get startVelocity():Vector2D 
+		{
+			return _startVelocity;
+		}
+		
+		public function get timeScore():int
+		{
+			return _timeScore;
+		}
+		public function get landScore():int
+		{
+			return _landScore;
+		}
+	}
+}
